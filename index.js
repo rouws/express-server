@@ -1,10 +1,31 @@
 const express = require('express');
 const slug = require('slug')
 const app = express();
+const { MongoClient } = require("mongodb");
 const dotenv = require('dotenv').config();
 const port = 3000;
 
 const categories = ["action", "adventure", "sci-fi", "animation", "horror", "thriller", "fantasy", "mystery", "comedy", "family"];
+
+let collection = null;
+async function connectDB() {
+  const uri = process.env.DB_URI;
+  const client = new MongoClient(uri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
+  try {
+    await client.connect();
+    collecion = await client.db("movies").command({ ping: 1 });
+    
+  } catch (error) {
+    console.log(error)
+  }
+}
+connectDB()
+  .then(() => {
+    console.log("We have a connection to Mongo!")
+  });
 
 
 // THIS IS A TEMPORARY SOLUTION UNTIL WE HAVE A DATABASE TO STORE INFORMATION
