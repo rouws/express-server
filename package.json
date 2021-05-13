@@ -1,7 +1,7 @@
 {
-  "name": "lab3a-backend-blok4",
+  "name": "lab4a-backend-blok4",
   "version": "1.0.0",
-  "description": "dit is een demo voor lab 3a over template engines en forms",
+  "description": "dit is een demo voor lab 4a over databases",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rouws/lab3a-backend-blok4.git"
+    "url": "git+https://github.com/rouws/lab4a-backend-blok4.git"
   },
   "keywords": [
     "template engines"
@@ -17,9 +17,9 @@
   "author": "Sonja Rouwhorst",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/rouws/lab3a-backend-blok4/issues"
+    "url": "https://github.com/rouws/lab4a-backend-blok4/issues"
   },
-  "homepage": "https://github.com/rouws/lab3a-backend-blok4#readme",
+  "homepage": "https://github.com/rouws/lab4a-backend-blok4#readme",
   "dependencies": {
     "ejs": "^3.1.6",
     "express": "^4.17.1",
