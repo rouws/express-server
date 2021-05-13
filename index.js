@@ -7,7 +7,7 @@ const port = 3000;
 
 const categories = ["action", "adventure", "sci-fi", "animation", "horror", "thriller", "fantasy", "mystery", "comedy", "family"];
 
-let collection = null;
+let db = null;
 async function connectDB() {
   const uri = process.env.DB_URI;
   const client = new MongoClient(uri, {
@@ -16,7 +16,7 @@ async function connectDB() {
   });
   try {
     await client.connect();
-    collecion = await client.db("movies").command({ ping: 1 });
+    db = await client.db("movies").command({ ping: 1 });
     
   } catch (error) {
     console.log(error)
