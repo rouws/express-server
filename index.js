@@ -1,6 +1,7 @@
 const express = require('express');
 const slug = require('slug')
 const app = express();
+const dotenv = require('dotenv').config();
 const port = 3000;
 
 const categories = ["action", "adventure", "sci-fi", "animation", "horror", "thriller", "fantasy", "mystery", "comedy", "family"];
