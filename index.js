@@ -16,8 +16,7 @@ async function connectDB() {
   });
   try {
     await client.connect();
-    db = await client.db("movies").command({ ping: 1 });
-    
+    db = await client.db(process.env.DB_NAME);
   } catch (error) {
     console.log(error)
   }
