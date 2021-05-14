@@ -34,11 +34,14 @@ app.get('/', (req, res) => {
   res.render('home', {title: 'This is the homepage'})
 });
 
-app.get('/movies', (req, res) => {
+app.get('/movies', async (req, res) => {
   // TODO ADD FILTERING OPTIONS
-  // TODO GET ALL MOVIES FROM DATABASE
-  const movies = [];
-  res.render('movielist', {title: "All movies", movies})
+  // GET ALL MOVIES FROM DATABASE
+  const query = {};
+  const options = {sort: {year: -1, name: 1}};
+  const movies = await db.collection('movies').find(query, options).toArray();
+  const title  = (movies.length == 0) ? "No movies were found" : "We found these movies"
+  res.render('movielist', {title, movies})
 });
 
 app.get('/movies/:movieId/:slug', (req, res) => {
