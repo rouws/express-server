@@ -46,7 +46,7 @@ app.get('/movies', async (req, res) => {
 });
 
 app.get('/movies/:movieId/:slug', async (req, res, next) => {
-  // TODO GET MOVIE FROM DATABASE
+  // GET MOVIE FROM DATABASE
   const query = {_id: ObjectId(req.params.movieId)};
   console.log(query);
   const movie = await db.collection('movies').findOne(query);
@@ -61,7 +61,7 @@ app.get('/movies/add', (req, res) => {
   res.render('addmovie', {title: "Add a movie", categories})
 });
 
-app.post('/movies/add', (req, res) => {
+app.post('/movies/add', async (req, res) => {
   let movie = {
     slug: slug(req.body.name),
     name: req.body.name, 
@@ -70,7 +70,11 @@ app.post('/movies/add', (req, res) => {
     storyline: req.body.storyline
   };
   // TODO ADD MOVIE TO DATABASE
-  // TODO GET NEW LIST OF ALL MOVIES FROM DATABASE
+  const result = await db.collection('movies').insertOne(movie);
+  // GET NEW LIST OF ALL MOVIES FROM DATABASE
+  const query = {};
+  const options = {sort: {year: -1, name: 1}};
+  const movies = await db.collection('movies').find(query, options).toArray();
   res.render('movielist', {title: "Succesfully added the movie", movies})
 });
 
