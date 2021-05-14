@@ -18,7 +18,7 @@ let db = null;
  ****************************************************/
 app.use(express.static('public'))
 app.use(express.json());
-app.use(express.urlencoded());
+app.use(express.urlencoded({extended: true}));
 
 /*****************************************************
  * Set view engine
@@ -52,7 +52,13 @@ app.get('/movies/add', (req, res) => {
 });
 
 app.post('/movies/add', (req, res) => {
-  let movie = {slug: slug(req.body.name), id: 204860, name: req.body.name, year: req.body.year, categories: req.body.categories, storyline: req.body.storyline};
+  let movie = {
+    slug: slug(req.body.name),
+    name: req.body.name, 
+    year: req.body.year, 
+    categories: req.body.categories, 
+    storyline: req.body.storyline
+  };
   // TODO ADD MOVIE TO DATABASE
   // TODO GET NEW LIST OF ALL MOVIES FROM DATABASE
   res.render('movielist', {title: "Succesfully added the movie", movies})
