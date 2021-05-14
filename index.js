@@ -10,6 +10,7 @@ const dotenv = require('dotenv').config();
  ****************************************************/
 
 const port = 3000;
+const years = ["2017", "2018", "2019", "2020", "2021"];
 const categories = ["action", "adventure", "sci-fi", "animation", "horror", "thriller", "fantasy", "mystery", "comedy", "family"];
 let db = null;
 
@@ -36,13 +37,27 @@ app.get('/', (req, res) => {
 });
 
 app.get('/movies', async (req, res) => {
+  console.log(req.query)
   // TODO ADD FILTERING OPTIONS
+  let queryCategories = {};
+  if (req.query.categories) {
+    queryCategories = { categories: req.query.categories};
+  }
+  let queryYears = {};
+  if (req.query.years && Array.isArray(req.query.years)) {
+    queryYears = { year: {$in: req.query.years}}
+  } else if (req.query.years && !Array.isArray(req.query.years)) {
+    queryYears = { year: {$in: [req.query.years]}}
+  }
   // GET ALL MOVIES FROM DATABASE
-  const query = {};
+  const query = { ...queryCategories, ...queryYears};
+  console.log(query);
   const options = {sort: {year: -1, name: 1}};
   const movies = await db.collection('movies').find(query, options).toArray();
-  const title  = (movies.length == 0) ? "No movies were found" : "We found these movies"
-  res.render('movielist', {title, movies})
+  const title  = (movies.length == 0) ? "No movies were found" : "We found these movies";
+  const selectedYears = req.query.years || [];
+  const selectedCategories = req.query.categories || [];
+  res.render('movielist', {title, movies, years, categories, selectedYears, selectedCategories})
 });
 
 app.get('/movies/:movieId/:slug', async (req, res, next) => {
@@ -75,7 +90,7 @@ app.post('/movies/add', async (req, res) => {
   const query = {};
   const options = {sort: {year: -1, name: 1}};
   const movies = await db.collection('movies').find(query, options).toArray();
-  res.render('movielist', {title: "Succesfully added the movie", movies})
+  res.render('movielist', {title: "Succesfully added the movie", movies, years, categories})
 });
 
 
