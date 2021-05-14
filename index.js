@@ -2,6 +2,7 @@ const express = require('express');
 const slug = require('slug')
 const app = express();
 const { MongoClient } = require("mongodb");
+const { ObjectId } = require('mongodb');
 const dotenv = require('dotenv').config();
 
 /*****************************************************
@@ -44,10 +45,16 @@ app.get('/movies', async (req, res) => {
   res.render('movielist', {title, movies})
 });
 
-app.get('/movies/:movieId/:slug', (req, res) => {
+app.get('/movies/:movieId/:slug', async (req, res, next) => {
   // TODO GET MOVIE FROM DATABASE
-  const movie = {};
-  res.render('moviedetails', {title: `Moviedetails for ${movie.name}`, movie})
+  const query = {_id: ObjectId(req.params.movieId)};
+  console.log(query);
+  const movie = await db.collection('movies').findOne(query);
+  if (movie) {
+    res.render('moviedetails', {title: `Moviedetails for ${movie.name}`, movie})
+  } else {
+    return next();
+  }
 });
 
 app.get('/movies/add', (req, res) => {
