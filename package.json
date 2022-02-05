@@ -1,15 +1,15 @@
 {
-  "name": "lab4a-backend-blok4",
+  "name": "express-server",
   "version": "1.0.0",
-  "description": "dit is een demo voor lab 4a over databases",
-  "main": "index.js",
+  "description": "express server for movielist example",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon index.js"
+    "start": "nodemon server.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rouws/lab4a-backend-blok4.git"
+    "url": "git+https://github.com/rouws/express-server.git"
   },
   "keywords": [
     "template engines"
@@ -17,9 +17,9 @@
   "author": "Sonja Rouwhorst",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/rouws/lab4a-backend-blok4/issues"
+    "url": "https://github.com/rouws/express-server/issues"
   },
-  "homepage": "https://github.com/rouws/lab4a-backend-blok4#readme",
+  "homepage": "https://github.com/rouws/express-server#readme",
   "dependencies": {
     "dotenv": "^9.0.2",
     "ejs": "^3.1.6",
