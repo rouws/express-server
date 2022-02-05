@@ -1,3 +1,6 @@
+html *{
+    box-sizing: border-box;
+}
 body {
     font-family: sans-serif;
 }
@@ -37,13 +40,27 @@ a {
 a:hover {
     text-decoration: underline;
 }
-form {
-    min-width: 200px;
-}
 form > * {
     margin: 1em;
 }
-legend {
+button {
+    background: cadetblue;
+    min-width: 20em;
+    padding: .5em;
+    border: none;
+    color: white;
+    font-size: 1em;
+}
+input[type=text], input[type=number], textarea {
+    border: 1px solid gray;
+    min-width: 36em;
+    padding: .3em;
+}
+fieldset {
+    max-width: 30em;
+    border: 1px solid gray;
+}
+legend{
     font-weight: bold;
 }
 .columns {

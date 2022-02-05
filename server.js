@@ -80,13 +80,16 @@ app.post('/movies/add', async (req, res) => {
     categories: req.body.categories, 
     storyline: req.body.storyline
   };
+  console.log(movie)
   // TODO ADD MOVIE TO DATABASE
   const result = await db.collection('movies').insertOne(movie);
   // GET NEW LIST OF ALL MOVIES FROM DATABASE
   const query = {};
   const options = {sort: {year: -1, name: 1}};
   const movies = await db.collection('movies').find(query, options).toArray();
-  res.render('movielist', {title: "Succesfully added the movie", movies, years, categories})
+  const selectedYears = [];
+  const selectedCategories = [];
+  res.render('movielist', {title: "Succesfully added the movie", movies, years, categories, selectedYears,selectedCategories})
 });
 
 
@@ -96,8 +99,7 @@ app.post('/movies/add', async (req, res) => {
  ****************************************************/
 
 app.use(function (req, res, next) {
-    // TODO render a nice 404 page
-    res.status(404).send("Sorry can't find that!")
+    res.status(404).render('404', {title: "Error 404"})
 })
 
 /*****************************************************
