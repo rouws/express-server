@@ -1,6 +1,5 @@
 body {
     font-family: sans-serif;
-    /* color: cadetblue; */
 }
 
 dt {
@@ -26,8 +25,8 @@ nav li {
     border-right: 1px solid white;
 }
 
-nav li:first-child {
-    border-left: 1px solid white;
+nav li:last-child {
+    border-right: none;
 }
 
 a {
@@ -52,4 +51,12 @@ legend {
 }
 .columns > * {
     padding: 1em;
+}
+footer {
+    padding: 1em;
+    background: cadetblue;
+    text-align: center;
+}
+footer a{
+    color: white;
 }
