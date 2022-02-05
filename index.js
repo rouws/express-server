@@ -2,6 +2,7 @@ const express = require('express');
 const slug = require('slug')
 const app = express();
 const { MongoClient } = require("mongodb");
+const { ObjectId } = require('mongodb');
 const dotenv = require('dotenv').config();
 
 /*****************************************************
@@ -9,6 +10,7 @@ const dotenv = require('dotenv').config();
  ****************************************************/
 
 const port = 3000;
+const years = ["2017", "2018", "2019", "2020", "2021"];
 const categories = ["action", "adventure", "sci-fi", "animation", "horror", "thriller", "fantasy", "mystery", "comedy", "family"];
 let db = null;
 
@@ -34,24 +36,47 @@ app.get('/', (req, res) => {
   res.render('home', {title: 'This is the homepage'})
 });
 
-app.get('/movies', (req, res) => {
+app.get('/movies', async (req, res) => {
+  console.log(req.query)
   // TODO ADD FILTERING OPTIONS
-  // TODO GET ALL MOVIES FROM DATABASE
-  const movies = [];
-  res.render('movielist', {title: "All movies", movies})
+  let queryCategories = {};
+  if (req.query.categories) {
+    queryCategories = { categories: req.query.categories};
+  }
+  let queryYears = {};
+  if (req.query.years && Array.isArray(req.query.years)) {
+    queryYears = { year: {$in: req.query.years}}
+  } else if (req.query.years && !Array.isArray(req.query.years)) {
+    queryYears = { year: {$in: [req.query.years]}}
+  }
+  // GET ALL MOVIES FROM DATABASE
+  const query = { ...queryCategories, ...queryYears};
+  console.log(query);
+  const options = {sort: {year: -1, name: 1}};
+  const movies = await db.collection('movies').find(query, options).toArray();
+  const title  = (movies.length == 0) ? "No movies were found" : "We found these movies";
+  const selectedYears = req.query.years || [];
+  const selectedCategories = req.query.categories || [];
+  res.render('movielist', {title, movies, years, categories, selectedYears, selectedCategories})
 });
 
-app.get('/movies/:movieId/:slug', (req, res) => {
-  // TODO GET MOVIE FROM DATABASE
-  const movie = {};
-  res.render('moviedetails', {title: `Moviedetails for ${movie.name}`, movie})
+app.get('/movies/:movieId/:slug', async (req, res, next) => {
+  // GET MOVIE FROM DATABASE
+  const query = {_id: ObjectId(req.params.movieId)};
+  console.log(query);
+  const movie = await db.collection('movies').findOne(query);
+  if (movie) {
+    res.render('moviedetails', {title: `Moviedetails for ${movie.name}`, movie})
+  } else {
+    return next();
+  }
 });
 
 app.get('/movies/add', (req, res) => {
   res.render('addmovie', {title: "Add a movie", categories})
 });
 
-app.post('/movies/add', (req, res) => {
+app.post('/movies/add', async (req, res) => {
   let movie = {
     slug: slug(req.body.name),
     name: req.body.name, 
@@ -60,8 +85,12 @@ app.post('/movies/add', (req, res) => {
     storyline: req.body.storyline
   };
   // TODO ADD MOVIE TO DATABASE
-  // TODO GET NEW LIST OF ALL MOVIES FROM DATABASE
-  res.render('movielist', {title: "Succesfully added the movie", movies})
+  const result = await db.collection('movies').insertOne(movie);
+  // GET NEW LIST OF ALL MOVIES FROM DATABASE
+  const query = {};
+  const options = {sort: {year: -1, name: 1}};
+  const movies = await db.collection('movies').find(query, options).toArray();
+  res.render('movielist', {title: "Succesfully added the movie", movies, years, categories})
 });
 
 

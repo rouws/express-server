@@ -8,6 +8,28 @@
 <body>
     <%- include('includes/header'); -%>
 
+    <form action="/movies" method="get">
+        <fieldset>
+            <legend>Years:</legend>
+            <% years.forEach(function(year){ %>
+            <input type="checkbox" name="years" value=<%= year %> id="<%= year %>"
+                <% if (selectedYears.includes(year)) { %> checked="checked" <% } %>>
+            <label for="<%= year %>"><%= year %></label><br>
+            <% }) %>
+        </fieldset>
+        <fieldset>
+            <legend>Categories:</legend>
+            <% categories.forEach(function(category){ %>
+            <input type="radio" name="categories" value="<%= category %>" id="<%= category %>"
+                <% if (selectedCategories.includes(category)) { %> checked="checked" <% } %>>
+            <label for="<%= category %>"><%= category %></label><br>
+            <% }) %>
+        </fieldset>
+        <button class="button">Filter</button>
+    </form>
+
+
+
     <h1><%= title %></h1>
 
     <% movies.forEach(function(movie){ %>
@@ -20,7 +42,7 @@
             <li><%= category %></li>
             <% }) %>
         </ul>
-        <p><a href="/movies/<%= movie.id %>/<%= movie.slug %>">Meer info</a></p>
+        <p><a href="/movies/<%= movie._id %>/<%= movie.slug %>">Meer info</a></p>
     </section>
     <% }) %>
     <%- include('includes/footer'); -%>
