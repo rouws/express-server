@@ -6,7 +6,7 @@ const { ObjectId } = require('mongodb');
 const dotenv = require('dotenv').config();
 
 /*****************************************************
- * Define some variables
+ * Define some constants and variables
  ****************************************************/
 
 const port = 3000;
@@ -32,13 +32,8 @@ app.set('view engine', 'ejs');
  * Routes
  ****************************************************/
 
-app.get('/', (req, res) => {
-  res.render('home', {title: 'This is the homepage'})
-});
-
-app.get('/movies', async (req, res) => {
-  console.log(req.query)
-  // TODO ADD FILTERING OPTIONS
+app.get('/', async (req, res) => {
+  // CREATE DB QUERY WITH FILTERING OPTIONS
   let queryCategories = {};
   if (req.query.categories) {
     queryCategories = { categories: req.query.categories};
@@ -48,10 +43,11 @@ app.get('/movies', async (req, res) => {
     queryYears = { year: {$in: req.query.years}}
   } else if (req.query.years && !Array.isArray(req.query.years)) {
     queryYears = { year: {$in: [req.query.years]}}
+
   }
-  // GET ALL MOVIES FROM DATABASE
   const query = { ...queryCategories, ...queryYears};
-  console.log(query);
+  console.log(`DB QUERY: ${query}`);
+  // GET MOVIES FROM DATABASE
   const options = {sort: {year: -1, name: 1}};
   const movies = await db.collection('movies').find(query, options).toArray();
   const title  = (movies.length == 0) ? "No movies were found" : "We found these movies";

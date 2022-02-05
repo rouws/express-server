@@ -1,6 +1,6 @@
 body {
     font-family: sans-serif;
-    color: cadetblue;
+    /* color: cadetblue; */
 }
 
 dt {
@@ -10,7 +10,9 @@ dt {
 dd {
     margin: 0 0 1em 0;
 }
-
+nav {
+    background: #ddd;
+}
 nav ul {
     display: flex;
     list-style: none;
@@ -21,18 +23,33 @@ nav ul {
 nav li {
     margin: 0;
     padding: 1em 3em;
-    border-right: 1px solid cadetblue;
+    border-right: 1px solid white;
 }
 
 nav li:first-child {
-    border-left: 1px solid cadetblue;
+    border-left: 1px solid white;
 }
 
-nav a {
+a {
     text-decoration: none;
     color: cadetblue
 }
 
-nav a:hover {
+a:hover {
     text-decoration: underline;
+}
+form {
+    min-width: 200px;
+}
+form > * {
+    margin: 1em;
+}
+legend {
+    font-weight: bold;
+}
+.columns {
+    display: flex;
+}
+.columns > * {
+    padding: 1em;
 }
