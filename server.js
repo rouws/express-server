@@ -3,6 +3,8 @@ const slug = require('slug');
 const { MongoClient } = require("mongodb");
 const { ObjectId } = require('mongodb');
 const dotenv = require('dotenv').config();
+const arrayify = require('array-back');
+
 
 /*****************************************************
  * Define some constants and variables
@@ -10,7 +12,7 @@ const dotenv = require('dotenv').config();
 
 const app = express();
 const port = 3000;
-const years = ["2017", "2018", "2019", "2020", "2021"];
+const years = ["2017", "2018", "2019", "2020", "2021", "2022"];
 const categories = ["action", "adventure", "sci-fi", "animation", "horror", "thriller", "fantasy", "mystery", "comedy", "family"];
 let db = null;
 
@@ -18,12 +20,12 @@ let db = null;
 /*****************************************************
  * Middleware
  ****************************************************/
-app.use(express.static('public'))
+app.use(express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
 /*****************************************************
- * Set view engine
+ * View engine
  ****************************************************/
 app.set('view engine', 'ejs');
 
@@ -33,45 +35,47 @@ app.set('view engine', 'ejs');
  ****************************************************/
 
 app.get('/', async (req, res) => {
-  // CREATE DB QUERY WITH FILTERING OPTIONS
+
+  // CHECK FOR FILTERS
+  const selectedYears = arrayify(req.query.years);
+  const selectedCategories = arrayify(req.query.categories);
+  
+  // CREATE DB QUERY FOR FILTERING MOVIES
+  let queryYears = {};
+  if (req.query.years) {
+    queryYears = { year: {$in: selectedYears}};
+  }
   let queryCategories = {};
   if (req.query.categories) {
-    queryCategories = { categories: req.query.categories};
+    queryCategories = { categories: {$in: selectedCategories}};
   }
-  let queryYears = {};
-  if (req.query.years && Array.isArray(req.query.years)) {
-    queryYears = { year: {$in: req.query.years}}
-  } else if (req.query.years && !Array.isArray(req.query.years)) {
-    queryYears = { year: {$in: [req.query.years]}}
-
-  }
-  const query = { ...queryCategories, ...queryYears};
-  console.log(query);
+  const dbQuery = { ...queryCategories, ...queryYears};
+  console.log("dbQuery: ", dbQuery);
+  
   // GET MOVIES FROM DATABASE
   const options = {sort: {year: -1, name: 1}};
-  const movies = await db.collection('movies').find(query, options).toArray();
+  const movies = await db.collection('movies').find(dbQuery, options).toArray();
+  
+  // RENDER PAGE
   const title  = (movies.length == 0) ? "No movies were found" : "We found these movies";
-  const selectedYears = req.query.years || [];
-  const selectedCategories = req.query.categories || [];
   res.render('movielist', {title, movies, years, categories, selectedYears, selectedCategories})
 });
 
 app.get('/movies/:movieId/:slug', async (req, res, next) => {
-  // GET MOVIE FROM DATABASE
-  const query = {_id: ObjectId(req.params.movieId)};
-  console.log(query);
-  const movie = await db.collection('movies').findOne(query)
+  const dbQuery = {_id: ObjectId(req.params.movieId)};
+  console.log("dbQuery: ", dbQuery);
+  const movie = await db.collection('movies').findOne(dbQuery)
     .then (movie => {
-      res.render('moviedetails', {title: `Moviedetails for ${movie.name}`, movie})
+      res.render('moviedetails', {title: `Moviedetails for ${movie.name}`, movie});
     })
     .catch (err => {
-      console.error("Movie not found")
+      console.error("Movie not found");
       next();
-    })
+    });
 });
 
 app.get('/movies/add', (req, res) => {
-  res.render('addmovie', {title: "Add a movie", categories})
+  res.render('addmovie', {title: "Add a movie", categories});
 });
 
 app.post('/movies/add', async (req, res) => {
@@ -79,11 +83,11 @@ app.post('/movies/add', async (req, res) => {
     slug: slug(req.body.name),
     name: req.body.name, 
     year: req.body.year, 
-    categories: req.body.categories, 
+    categories: arrayify(req.body.categories), 
     storyline: req.body.storyline
   };
-  console.log(movie)
-  // TODO ADD MOVIE TO DATABASE
+  console.log("Adding movie: ", movie);
+  // ADD MOVIE TO DATABASE
   const result = await db.collection('movies').insertOne(movie);
   // GET NEW LIST OF ALL MOVIES FROM DATABASE
   const query = {};
@@ -97,29 +101,28 @@ app.post('/movies/add', async (req, res) => {
 
 
 /*****************************************************
- * If no routes apply, show 404 Page
+ * If no routes give response, show 404 Page
  ****************************************************/
 
 app.use(function (req, res, next) {
-    res.status(404).render('404', {title: "Error 404: page not found"})
-})
+    res.status(404).render('404', {title: "Error 404: page not found"});
+});
 
 /*****************************************************
  * Connect to DB
  ****************************************************/
 async function connectDB() {
   const uri = process.env.DB_URI;
-  const client = new MongoClient(uri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
-  try {
-    await client.connect();
-    db = await client.db(process.env.DB_NAME);
-  } catch (error) {
-    console.log(error)
-  }
-}
+  const client = new MongoClient(uri, {useNewUrlParser: true, useUnifiedTopology: true});
+  await client.connect()
+    .then( (client) => {
+      db = client.db(process.env.DB_NAME);
+      console.log("Connected to mongo database\n");
+    })
+    .catch( (err) => { 
+      console.error(err);
+    });
+};
 
 
 /*****************************************************
@@ -127,9 +130,9 @@ async function connectDB() {
  ****************************************************/
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}!`)
-  connectDB()
-  .then(() => {
-    console.log("We have a connection to Mongo!")
-  });
+  connectDB();
+  console.log('==================================================\n\n')
+  console.log(`Webserver running on http://localhost:${port}\n\n`);
+  console.log('==================================================\n\n')
+
 });
