@@ -2,8 +2,8 @@ const express = require('express');
 const slug = require('slug');
 const { MongoClient } = require("mongodb");
 const { ObjectId } = require('mongodb');
-const dotenv = require('dotenv').config();
 const arrayify = require('array-back');
+require('dotenv').config();
 
 
 /*****************************************************
@@ -25,13 +25,22 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
 /*****************************************************
- * View engine
+ * Set template engine
  ****************************************************/
 app.set('view engine', 'ejs');
 
 
 /*****************************************************
  * Routes
+ * 
+ * GET /                        
+ *   home - show movielist
+ * GET /movies/:movieId/:slug   
+ *   show movie details
+ * GET /movies/add              
+ *   show form to add movie
+ * POST /movies/add             
+ *   add movie and show movielist
  ****************************************************/
 
 app.get('/', async (req, res) => {
@@ -57,18 +66,18 @@ app.get('/', async (req, res) => {
   const movies = await db.collection('movies').find(dbQuery, options).toArray();
   
   // RENDER PAGE
-  const title  = (movies.length == 0) ? "No movies were found" : "We found these movies";
+  const title  = (movies.length == 0) ? "No movies were found" : "Movies";
   res.render('movielist', {title, movies, years, categories, selectedYears, selectedCategories})
 });
 
 app.get('/movies/:movieId/:slug', async (req, res, next) => {
   const dbQuery = {_id: ObjectId(req.params.movieId)};
   console.log("dbQuery: ", dbQuery);
-  const movie = await db.collection('movies').findOne(dbQuery)
+  await db.collection('movies').findOne(dbQuery)
     .then (movie => {
       res.render('moviedetails', {title: `Moviedetails for ${movie.name}`, movie});
     })
-    .catch (err => {
+    .catch ( () => {
       console.error("Movie not found");
       next();
     });
@@ -88,23 +97,28 @@ app.post('/movies/add', async (req, res) => {
   };
   console.log("Adding movie: ", movie);
   // ADD MOVIE TO DATABASE
-  const result = await db.collection('movies').insertOne(movie);
-  // GET NEW LIST OF ALL MOVIES FROM DATABASE
-  const query = {};
-  const options = {sort: {year: -1, name: 1}};
-  const movies = await db.collection('movies').find(query, options).toArray();
-  const selectedYears = [];
-  const selectedCategories = [];
-  res.render('movielist', {title: "Succesfully added the movie", movies, years, categories, selectedYears,selectedCategories})
+  await db.collection('movies').insertOne(movie)
+    .catch((err) => {
+      console.error(err);
+      res.send(err);
+    });
+    // GET NEW LIST OF ALL MOVIES FROM DATABASE
+    const query = {};
+    const options = {sort: {year: -1, name: 1}};
+    const movies = await db.collection('movies').find(query, options).toArray();
+    // RENDER PAGE
+    const selectedYears = [];
+    const selectedCategories = [];
+    const title =  "Succesfully added the movie";
+    res.render('movielist', {title, movies, years, categories, selectedYears,selectedCategories})
 });
-
 
 
 /*****************************************************
  * If no routes give response, show 404 Page
  ****************************************************/
 
-app.use(function (req, res, next) {
+app.use(function (req, res) {
     res.status(404).render('404', {title: "Error 404: page not found"});
 });
 
@@ -122,11 +136,11 @@ async function connectDB() {
     .catch( (err) => { 
       console.error(err);
     });
-};
+}
 
 
 /*****************************************************
- * Start server
+ * Start webserver
  ****************************************************/
 
 app.listen(port, () => {
