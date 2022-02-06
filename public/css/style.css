@@ -4,11 +4,9 @@ html *{
 body {
     font-family: sans-serif;
 }
-
 dt {
     font-weight: bold;
 }
-
 dd {
     margin: 0 0 1em 0;
 }
@@ -21,22 +19,18 @@ nav ul {
     margin: 0;
     padding: 1em;
 }
-
 nav li {
     margin: 0;
     padding: 1em 3em;
     border-right: 1px solid white;
 }
-
 nav li:last-child {
     border-right: none;
 }
-
 a {
     text-decoration: none;
     color: cadetblue
 }
-
 a:hover {
     text-decoration: underline;
 }
@@ -63,17 +57,24 @@ fieldset {
 legend{
     font-weight: bold;
 }
-.columns {
-    display: flex;
-}
-.columns > * {
-    padding: 1em;
-}
 footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
     padding: 1em;
     background: cadetblue;
     text-align: center;
 }
 footer a{
     color: white;
+}
+.inner {
+    margin-bottom: 4em;
+}
+.columns {
+    display: flex;
+}
+.columns > * {
+    padding: 1em;
 }

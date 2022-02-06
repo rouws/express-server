@@ -9,18 +9,22 @@
 
     <%- include('includes/header.ejs') -%>
 
-    <h1><%= title %></h1>
+    <div class="inner">
 
-    <h2><%= movie.year %></h2>
+        <h1><%= title %></h1>
 
-    <h2>Categories:</h2>
-    <ul>
-        <% movie.categories.forEach(function(category){ %>
-        <li><%= category %></li>
-        <% }) %>
-    </ul>
+        <h2><%= movie.year %></h2>
 
-    <p><%= movie.storyline %></p>
+        <h2>Categories:</h2>
+        <ul>
+            <% movie.categories.forEach(function(category){ %>
+            <li><%= category %></li>
+            <% }) %>
+        </ul>
+
+        <p><%= movie.storyline %></p>
+
+    </div>
 
     <%- include('includes/footer.ejs') -%>
 

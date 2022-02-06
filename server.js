@@ -1,6 +1,5 @@
 const express = require('express');
-const slug = require('slug')
-const app = express();
+const slug = require('slug');
 const { MongoClient } = require("mongodb");
 const { ObjectId } = require('mongodb');
 const dotenv = require('dotenv').config();
@@ -9,6 +8,7 @@ const dotenv = require('dotenv').config();
  * Define some constants and variables
  ****************************************************/
 
+const app = express();
 const port = 3000;
 const years = ["2017", "2018", "2019", "2020", "2021"];
 const categories = ["action", "adventure", "sci-fi", "animation", "horror", "thriller", "fantasy", "mystery", "comedy", "family"];
@@ -46,7 +46,7 @@ app.get('/', async (req, res) => {
 
   }
   const query = { ...queryCategories, ...queryYears};
-  console.log(`DB QUERY: ${query}`);
+  console.log(query);
   // GET MOVIES FROM DATABASE
   const options = {sort: {year: -1, name: 1}};
   const movies = await db.collection('movies').find(query, options).toArray();
@@ -60,12 +60,14 @@ app.get('/movies/:movieId/:slug', async (req, res, next) => {
   // GET MOVIE FROM DATABASE
   const query = {_id: ObjectId(req.params.movieId)};
   console.log(query);
-  const movie = await db.collection('movies').findOne(query);
-  if (movie) {
-    res.render('moviedetails', {title: `Moviedetails for ${movie.name}`, movie})
-  } else {
-    return next();
-  }
+  const movie = await db.collection('movies').findOne(query)
+    .then (movie => {
+      res.render('moviedetails', {title: `Moviedetails for ${movie.name}`, movie})
+    })
+    .catch (err => {
+      console.error("Movie not found")
+      next();
+    })
 });
 
 app.get('/movies/add', (req, res) => {
@@ -99,7 +101,7 @@ app.post('/movies/add', async (req, res) => {
  ****************************************************/
 
 app.use(function (req, res, next) {
-    res.status(404).render('404', {title: "Error 404"})
+    res.status(404).render('404', {title: "Error 404: page not found"})
 })
 
 /*****************************************************
